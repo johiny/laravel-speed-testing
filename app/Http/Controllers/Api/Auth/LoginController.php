@@ -8,16 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
-class RegisterController extends Controller
+class LoginController extends Controller
 {
     public function __invoke(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|min:6|confirmed',
+                'email' => 'required|email',
+                'password' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -26,14 +26,21 @@ class RegisterController extends Controller
                 ], HttpResponse::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $request['password'] = Hash::make($request['password']);
+            $user = User::where('email', $request->email)->first();
 
-            $user = User::create($request->except('password_confirmation'));
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'message' => 'incorect email or password',
+                ], HttpResponse::HTTP_UNPROCESSABLE_ENTITY);
+            }
 
             return response()->json([
-                'data' => $user,
-                'message' => 'User has been created.'
-            ], HttpResponse::HTTP_CREATED);
+                'data' => [
+                    'user' => $user,
+                    'access_token' => $user->createToken($request->email)->plainTextToken
+                ],
+                'message' => 'incorect email or password',
+            ], HttpResponse::HTTP_OK);
         } catch (\Exception $e) {
 
             return response()->json([
