@@ -9,6 +9,7 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -77,4 +78,33 @@ class LoginController extends Controller
             ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    //SPA FUNCTIONS
+
+//     public function login(Request $request)
+//     {
+//         $credentials = $request->validate([
+//             'email' => ['required', 'email'],
+//             'password' => ['required'],
+//         ]);
+
+//         if (!Auth::attempt($credentials)) {
+//             return response()->json([
+//                 'message' => 'invalid email or password'
+//             ]);
+
+//         }
+//         return response()->json([
+//             'data' => $request->user(),
+//             'message' => 'user logged in'
+//         ]);
+//     }
+
+//     public function logout(Request $request){
+
+//     Auth::logout();
+//     return response()->json([
+//         'message' => "user has been logged out"
+//     ]);
+// }
 }
