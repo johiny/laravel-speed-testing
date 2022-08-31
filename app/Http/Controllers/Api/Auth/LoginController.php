@@ -22,7 +22,7 @@ class LoginController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'email' => 'required|email',
+                'user_name' => 'required|email',
                 'password' => 'required',
             ]);
 
@@ -32,7 +32,7 @@ class LoginController extends Controller
                 ], HttpResponse::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->user_name)->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
@@ -42,8 +42,8 @@ class LoginController extends Controller
 
             return response()->json([
                 'data' => [
-                    'user' => $user,
-                    'access_token' => $user->createToken($request->email)->plainTextToken
+                    'fullname' => $user->name,
+                    'token' => $user->createToken($request->user_name)->plainTextToken
                 ],
                 'message' => 'token has been created.',
             ], HttpResponse::HTTP_OK);
